@@ -1,2 +1,1 @@
-# reactor-fit
-This is a reactor fit using the emcee sampling
+This directory contains the source files for GLoBESfit.

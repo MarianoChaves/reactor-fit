@@ -1,0 +1,123 @@
+%!GLoBES
+
+/* 
+  This file contains a combination of different experiments in constraining
+  the properties of antineutrinos coming from reactors...
+
+  The overall number of events will be irrelevant for what we want to calculate
+  in this module, so we elect to set @time, @power and @target_mass all to unity.
+
+  This particular file deals with spectral measurements. The order of experiments is as
+  follows:
+
+  0 - Daya Bay EH1 AD1 (special format to be compatible with NEOS)
+  1 - Daya Bay EH1 AD2 (special format to be compatible with NEOS)
+  2 - Daya Bay EH2 AD3 (special format to be compatible with NEOS)
+  3 - Daya Bay EH2 AD8 (special format to be compatible with NEOS)
+
+  4 - Daya Bay EH3 AD4
+  5 - Daya Bay EH3 AD5
+  6 - Daya Bay EH3 AD6
+  7 - Daya Bay EH3 AD7
+
+  8 - Double Chooz ND
+  9 - Double Chooz FD
+
+  10 - RENO ND
+  11 - RENO FD
+  
+  12 - KAMLAND
+
+  THIS FILE CONTAINS ONLY RENO
+*/
+
+/*********************************************************************************
+* 
+* THIS IS THE DEFINITION OF THE KAMLAND
+* 
+*@article{Gando:2013nba,
+*    author = "Gando, A. and others",
+*    collaboration = "KamLAND",
+*    title = "{Reactor On-Off Antineutrino Measurement with KamLAND}",
+*    eprint = "1303.4667",
+*    archivePrefix = "arXiv",
+*    primaryClass = "hep-ex",
+*    doi = "10.1103/PhysRevD.88.033001",
+*    journal = "Phys. Rev. D",
+*    volume = "88",
+*    number = "3",
+*    pages = "033001",
+*    year = "2013"
+*}
+*
+**********************************************************************************/
+
+ $version="3.2.17.0"
+ $oscillation_engine="KAMLAND" 
+
+/*
+  Experimental specifics for KAMLAND
+*/
+
+/* ####### Reactor flux ####### */
+
+nuflux(#Reactor_Flux)<
+	@flux_file="Fluxes/Reactorflux_combined.dat"
+	@time = 1.0		/* days */
+	@power = 8.0 	/* GW thermal */
+	@norm = 0.049041931
+>
+
+/* ####### Detector settings ####### */
+
+$target_mass = 	        1.0  /* tons (fiducial mass) */
+
+/* ####### Energy window ####### */
+
+$emin = 	        0.001710	/* GeV */
+$emax = 	        0.008910	/* GeV */
+$bins =			17
+
+$sampling_points = 453
+
+/* ######## Baseline setting ######## */
+
+$profiletype = 		3 
+$densitytab = 		{0}
+$lengthtab = 		{202.8} /* km */
+
+/* ######## Technical information ######## */
+
+$filter_state = 1
+$filter_value = 0.0001 
+
+/* ####### Energy resolution ####### */
+
+energy(#ERES)<
+        @type = 1
+        @sigma_function = #inverse_beta
+        @sigma_e = {0.064,0,0} >
+
+/* ####### Cross sections ####### */
+
+cross(#Reactor_CC)<
+@cross_file = "Fluxes/IBDnew.dat"
+>
+
+/* ####### Channel definitions ####### */
+
+channel(#Reactor_Channel)<
+	@channel = 	#Reactor_Flux:	-:	e:	e:	#Reactor_CC:    #ERES
+	@post_smearing_efficiencies = {0.5,0.8,0.85,0.85,0.85,0.88,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90}	
+>
+
+/* ####### Setting the rules ####### */
+
+rule(#ALL)<
+ 	@signal = 1@#Reactor_Channel
+	@background = 0@#Reactor_Channel
+	@sys_on_function = "chiZero"
+	@sys_off_function = "chiZero"
+> 
+
+/**********************END*******************************/
